@@ -1,8 +1,10 @@
 #include <iostream>
 #include <vector>
 #include <random>
+#include <algorithm>
 
 #include "parameter.hpp"
+#include "utils.hpp"
 #include "individual.hpp"
 #include "operation.hpp"
 
@@ -16,8 +18,9 @@ int main(){
         for(int g = 1; g <= param::generation; g++){
 
             // m + 1個の親子体x_i(i = 1, ..., m + 1)をランダムに選択する
-            std::vector<individual> parents(param::m + 1);
-            for(int i = 0; i < param::m + 1; i++) parents[i].select(population);
+            std::vector<int> parent_index(param::m + 2);
+            std::vector<individual> parents(param::m + 2);
+            for(int i = 0; i < param::m + 1; i++) parent_index[i] = random_select(parents[i], population);
 
             // 親子体の重心pを求める
             std::vector<double> p(param::n, 0);
@@ -28,13 +31,12 @@ int main(){
             for(int i = 0; i < param::m + 1; i++) d = parents[i].gene - p;
 
             // m + 2番目の親子体x_(m + 2)をランダムに選択する
-            individual p_m2;
-            p_m2.select(population);
+            parent_index[param::m + 1] = random_select(parents[param::m + 1], population);
 
-            // D = d_(m + 2)からd_1, ..., d_mが生成する面へ直交するベクトルの大きさ
+            // D = d_(m + 2)からd_1, ..., d_mが生成する面へ直交するベクトルの大きさ(未実装)
             double D = 0.;
 
-            // e_1, ..., e(n - m)をd_1, ..., d_(m)に直行する部分空間の正規直交基底とする
+            // e_1, ..., e(n - m)をd_1, ..., d_(m)に直行する部分空間の正規直交基底とする(未実装)
             std::vector<std::vector<double> > e(param::n - param::m, std::vector<double>(param::n));
 
             // 個々体x_cを生成する
@@ -46,8 +48,19 @@ int main(){
                 for(int i = 0; i < param::m; i++) wd += dist_xi(param::mt) * d[i];
                 for(int i = 0; i < param::n - param::m; i++) vDe += dist_eta(param::mt) * D * e[i];
                 children[i].gene = p + wd + vDe;
+                children[i].evaluate();
             }
 
+            // 親個体中のランダムな２個体を変更する
+            for(int i = 0; i < param::m + 2; i++) children.push_back(parents[i]);
+            std::uniform_int_distribution<> select_parent(0, param::m + 1);
+            int random_index = select_parent(param::mt);
+            int roulette_index = select_parent(param::mt);
+            random_index = random_select(population[parent_index[random_index]], children);
+            roulette_index = random_select(population[parent_index[roulette_index]], children);
+
+            // 最も良い評価値の出力
+            std::cout << "generation : " << g << ", fitness = " << std::min_element(population.begin(), population.end())->fitness << std::endl;;
         }
     }
 
