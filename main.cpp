@@ -6,7 +6,7 @@
 #include "parameter.hpp"
 #include "utils.hpp"
 #include "individual.hpp"
-#include "operation.hpp"
+#include "vector.hpp"
 
 int main(){
 
@@ -27,14 +27,21 @@ int main(){
             for(int i = 0; i < param::m + 1; i++) p += parents[i].gene; p /= (param::m + 1);
 
             // pと各個体x_iの差分ベクトルd_i = x_i - pを求める
-            std::vector<double> d(param::n);
-            for(int i = 0; i < param::m + 1; i++) d = parents[i].gene - p;
+            std::vector<std::vector<double> > d(param::m + 2, std::vector<double>(param::n));
+            for(int i = 0; i < param::m + 1; i++) d[i] = parents[i].gene - p;
 
             // m + 2番目の親子体x_(m + 2)をランダムに選択する
             parent_index[param::m + 1] = random_select(parents[param::m + 1], population);
 
-            // D = d_(m + 2)からd_1, ..., d_mが生成する面へ直交するベクトルの大きさ(未実装)
-            double D = 0.;
+            // d_1, ..., d_mが張る面の法線nを求める
+            std::vector<double> n(param::n);
+            std::vector<std::vector<double> > plane(d.begin(), d.begin() + param::m + 1);
+            n = normal(plane);
+
+            // D = d_(m + 2)からd_1, ..., d_mが張る面へ直交するベクトルの大きさ
+            d[param::m + 1] = parents[param::m + 1].gene - p;
+            double D = dot(d[param::m + 1], n) * norm(n);
+            D = std::fabs(D);
 
             // e_1, ..., e(n - m)をd_1, ..., d_(m)に直行する部分空間の正規直交基底とする(未実装)
             std::vector<std::vector<double> > e(param::n - param::m, std::vector<double>(param::n));
