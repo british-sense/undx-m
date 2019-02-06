@@ -107,7 +107,7 @@ double dot(const std::vector<double> &vec1, const std::vector<double> &vec2){
 double norm(const std::vector<double> &vec, int p = 2){
     double norm = 0.;
     for(size_t i = 0; i < vec.size(); i++) norm += vec[i] * vec[i];
-    return std::pow(norm, 1 / p);
+    return std::pow(norm, 1. / p);
 }
 
 void gram_schimidt(std::vector<std::vector<double> > &vec){

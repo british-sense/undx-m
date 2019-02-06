@@ -8,7 +8,7 @@
 #include "individual.hpp"
 #include "vector.hpp"
 
-int main(){
+int main(){ 
 
     for(int t = 1; t <= param::trial; t++){
 
