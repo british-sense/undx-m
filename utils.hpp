@@ -33,16 +33,17 @@ int roulette_select(individual &indiv, std::vector<individual> set){
     for(size_t i = 0; i < set.size(); i++) set[i].fitness = sum_fitness - set[i].fitness;
     double roulette_fitness = 0.;
     for(size_t i = 0; i < set.size(); i++) roulette_fitness += set[i].fitness;
-    std::uniform_int_distribution<> roulette(0, roulette_fitness);
+    std::uniform_real_distribution<> roulette(0, roulette_fitness);
     roulette_fitness = roulette(param::mt);    
     int index = 0;
     for(size_t i = 0; i < set.size(); i++){
         roulette_fitness -= set[i].fitness;
         if(roulette_fitness <= 0){
             index = i;
-            indiv = set[i];
+            break;
         }
     }
+    indiv = set[index];
     return index;
 }
 

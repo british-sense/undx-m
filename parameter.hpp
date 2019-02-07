@@ -4,7 +4,7 @@
 #include<random>
 
 namespace param{
-    static int n = 10;
+    static int n = 100;
     static int trial = 1;
     static int generation = 10000;
     static int population = 300;
