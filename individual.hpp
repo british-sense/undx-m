@@ -30,6 +30,7 @@ class individual{
         double A = 10;
         fitness = A * param::n;
         for(int i = 0; i < param::n; i++) fitness += (gene[i] * gene[i] - A * std::cos(2 * M_PI * gene[i]));
+        param::opt_fitness = 1e-7;
     }
 
     public:

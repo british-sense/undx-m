@@ -8,7 +8,9 @@
 #include "individual.hpp"
 #include "vector.hpp"
 
-int main(){ 
+int main(){
+
+    int opt_count = 0;
 
     for(int t = 1; t <= param::trial; t++){
 
@@ -37,9 +39,8 @@ int main(){
             parent_index[param::m + 1] = random_select(parents[param::m + 1], population);
 
             // d_1, ..., d_mが張る面の法線nを求める
-            std::vector<std::vector<double> > plane(d.begin(), d.begin() + param::m);
             std::vector<double> n(param::n);
-            n = normal(plane);
+            n = normal(d);
 
             // D = d_(m + 2)からd_1, ..., d_mが張る面へ直交するベクトルの大きさ
             d[param::m + 1] = parents[param::m + 1].gene - p;
@@ -48,17 +49,20 @@ int main(){
             D = std::fabs(D);
 
             // e_1, ..., e(n - m)をd_1, ..., d_(m)に直行する部分空間の正規直交基底とする
-            std::vector<std::vector<double> > e(param::n + 1, std::vector<double>(param::n));
+            std::vector<std::vector<double> > e;
+            std::vector<std::vector<double> > plane(d);
+            gram_schimidt(plane);
             std::normal_distribution<> dist(0.0, 1.0);
-            for(int i = 0; i < param::n + 1; i++){
-                if(i < param::m + 1) e[i] = d[i];
-                else{
-                    for(int j = 0; j < param::n + 1; j++){
-                        e[i][j] = dist(param::mt);
-                    }
-                }
+            while(e.size() != param::n - param::m){
+                std::vector<double> norm_vec(param::n);
+                for(int i = 0; i < param::n; i++) norm_vec[i] = dist(param::mt);
+                std::vector<double> sum_vec(param::n, 0);
+                for(int i = 0; i < plane.size(); i++) sum_vec += dot(norm_vec, plane[i]) * plane[i];
+                norm_vec = norm_vec - sum_vec;
+                norm_vec /= norm(norm_vec);
+                plane.push_back(norm_vec);
+                e.push_back(norm_vec);
             }
-            gram_schimidt(e);
 
             // 個々体x_cを生成する
             std::vector<individual> children(param::children);
@@ -67,25 +71,27 @@ int main(){
             for(int i = 0; i < param::children; i += 2){
                 std::vector<double> wd(param::n, 0), vDe(param::n, 0);
                 for(int i = 0; i < param::m; i++) wd += w(param::mt) * d[i];
-                for(int i = e.size() - 1; i >= e.size() - 1 - param::n + param::m; i--) vDe += v(param::mt) * D * e[i];
+                for(int i = 0; i < param::n - param::m; i++) vDe += v(param::mt) * D * e[i];
                 children[i].gene = p + wd + vDe;
                 children[i + 1].gene = p - wd - vDe;
                 children[i].evaluate();
                 children[i + 1].evaluate();
             }
 
-            // 親個体中のランダムな２個体を変更する
-            for(int i = 0; i < param::m + 2; i++) children.push_back(parents[i]);
-            std::uniform_int_distribution<> select_parent(0, param::m);
-            int best_index = select_parent(param::mt);
-            int roulette_index = select_parent(param::mt);
-            best_index = best_select(population[parent_index[best_index]], children);
-            roulette_index = roulette_select(population[parent_index[roulette_index]], children);
+            // JGGによる更新
+            std::sort(children.begin(), children.end());
+            for(int i = 0; i < param::m + 2; i++) population[parent_index[i]] = children[i];
 
             // 最も良い評価値の出力
             std::cout << "generation : " << g << ", fitness = " << std::min_element(population.begin(), population.end())->fitness << std::endl;
+            if(std::min_element(population.begin(), population.end())->fitness < param::opt_fitness){
+                opt_count++;
+                break;
+            }
         }
     }
+
+    std::cout << "opt count : " << opt_count << std::endl;
 
     return 0;
 }
