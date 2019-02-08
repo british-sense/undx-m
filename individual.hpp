@@ -21,6 +21,11 @@ class individual{
         fitness = 0.;
     }
     void evaluate(){
+
+        // // sphere
+        // fitness = 0.;
+        // for(int i = 0; i < param::n; i++) fitness += (gene[i] * gene[i]);
+
         // rastrigin
         double A = 10;
         fitness = A * param::n;

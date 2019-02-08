@@ -131,12 +131,16 @@ void gram_schimidt(std::vector<std::vector<double> > &vec){
     vec = norm_vec;
 }
 
-std::vector<double> normal(std::vector<std::vector<double> > plane){
-    size_t dim = plane.front().size();
+std::vector<double> normal(const std::vector<std::vector<double> > &plane){
+    std::vector<std::vector<double> > p(plane);
+    std::normal_distribution<> dist(0.0, 1.0);
+    int dim = p.front().size();
     std::vector<double> n(dim);
-    // グラムシュミットの直交化法で求める
-    gram_schimidt(plane);
-    return plane.back();
+    for(int i = 0; i < dim; i++) n[i] = dist(param::mt);
+    p.push_back(n);
+    // グラムシュミットの直交化法で求める200
+    gram_schimidt(p);
+    return p.back();
 }
 
 void output(const std::vector<double> &vec){

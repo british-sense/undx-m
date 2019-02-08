@@ -4,7 +4,7 @@
 #include<random>
 
 namespace param{
-    static int n = 100;
+    static int n = 20;
     static int trial = 1;
     static int generation = 10000;
     static int population = 300;
@@ -14,6 +14,8 @@ namespace param{
     static double beta = 0.35;
     static double sigma_xi = alpha / std::sqrt(m);
     static double sigma_eta = (1 / std::sqrt(n - m)) * (std::sqrt(m + 1) / std::sqrt(m + 2)) * (std::sqrt(3) / std::sqrt(2)) * beta;
+    // static double sigma_xi = 0.5;
+    // static double sigma_eta = 0.35 / std::sqrt(param::n);
     static double upper_limit = 5.12;
     static double lower_limit = -5.12;
     std::mt19937 mt;
