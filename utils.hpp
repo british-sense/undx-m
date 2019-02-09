@@ -2,11 +2,13 @@
 #define utils_hpp
 
 #include <random>
+#include <algorithm>
 
 #include "parameter.hpp"
 #include "individual.hpp"
 
-int best_select(individual &indiv, const std::vector<individual> &set){
+individual best_select(const std::vector<individual> &set, std::vector<int> &index_list){
+
     int index = 0;
     double min = 1e12;
     for(size_t i = 0; i < set.size(); i++){
@@ -15,36 +17,39 @@ int best_select(individual &indiv, const std::vector<individual> &set){
             index = i;
         }
     }
-    indiv = set[index];
-    return index;
+    index_list.push_back(index);
+    return set[index];
 }
 
-int random_select(individual &indiv, const std::vector<individual> &set){
+individual random_select(const std::vector<individual> &set, std::vector<int> &index_list){
     std::uniform_int_distribution<> range(0, set.size() - 1);
     int index = range(param::mt);
-    indiv = set[index];
-    return index;
+    while(std::find(index_list.begin(), index_list.end(), index) != index_list.end()){
+        index = range(param::mt);
+    }
+    index_list.push_back(index);
+    return set[index];
 }
 
-int roulette_select(individual &indiv, std::vector<individual> set){
+individual roulette_select(const std::vector<individual> &set, std::vector<int> &index_list){
 
     double sum_fitness = 0.;
+    std::vector<individual> reverse_set(set);
     for(size_t i = 0; i < set.size(); i++) sum_fitness += set[i].fitness;
-    for(size_t i = 0; i < set.size(); i++) set[i].fitness = sum_fitness - set[i].fitness;
-    double roulette_fitness = 0.;
-    for(size_t i = 0; i < set.size(); i++) roulette_fitness += set[i].fitness;
-    std::uniform_real_distribution<> roulette(0, roulette_fitness);
-    roulette_fitness = roulette(param::mt);    
+    for(size_t i = 0; i < set.size(); i++) reverse_set[i].fitness = sum_fitness - set[i].fitness;
+    for(size_t i = 0; i < reverse_set.size(); i++) sum_fitness += reverse_set[i].fitness;
+    std::uniform_real_distribution<> roulette(0, sum_fitness);
+    double roulette_fitness = roulette(param::mt);    
     int index = 0;
-    for(size_t i = 0; i < set.size(); i++){
-        roulette_fitness -= set[i].fitness;
+    for(size_t i = 0; i < reverse_set.size(); i++){
+        roulette_fitness -= reverse_set[i].fitness;
         if(roulette_fitness <= 0){
             index = i;
             break;
         }
     }
-    indiv = set[index];
-    return index;
+    index_list.push_back(index);
+    return set[index];
 }
 
 #endif

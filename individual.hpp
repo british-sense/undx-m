@@ -40,6 +40,9 @@ class individual{
     bool operator>(const individual& rhs)const{
         return fitness > rhs.fitness;
     }
+    bool operator==(const individual& rhs)const{
+        return gene == rhs.gene;
+    }
 };
 
 #endif

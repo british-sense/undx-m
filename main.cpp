@@ -10,6 +10,13 @@
 
 int main(){
 
+    std::cout << "number of trial : " << param::trial
+    std::cout << "number of generation : " << param::generation
+    std::cout << "population size : " << param::population
+    std::cout << "children size : " << param::children
+    std::cout << "number of parents : " << param::m
+    std::cout << "number of dimention : " << param::n
+
     int opt_count = 0;
 
     for(int t = 1; t <= param::trial; t++){
@@ -22,9 +29,9 @@ int main(){
         for(int g = 1; g <= param::generation; g++){
 
             // m + 1個の親子体x_i(i = 1, ..., m + 1)をランダムに選択する
-            std::vector<int> parent_index(param::m + 2);
-            std::vector<individual> parents(param::m + 2);
-            for(int i = 0; i < param::m + 1; i++) parent_index[i] = random_select(parents[i], population);
+            std::vector<int> parent_index;
+            std::vector<individual> parents;
+            for(int i = 0; i < param::m + 1; i++) parents.push_back(random_select(population, parent_index));
 
             // 親子体の重心pを求める
             std::vector<double> p(param::n, 0);
@@ -32,18 +39,18 @@ int main(){
             p /= (param::m + 1);
 
             // pと各個体x_iの差分ベクトルd_i = x_i - pを求める
-            std::vector<std::vector<double> > d(param::m + 2, std::vector<double>(param::n));
-            for(int i = 0; i < param::m + 1; i++) d[i] = parents[i].gene - p;
+            std::vector<std::vector<double> > d;
+            for(int i = 0; i < param::m + 1; i++) d.push_back(parents[i].gene - p);
 
             // m + 2番目の親子体x_(m + 2)をランダムに選択する
-            parent_index[param::m + 1] = random_select(parents[param::m + 1], population);
+            parents.push_back(random_select(population, parent_index));
 
             // d_1, ..., d_mが張る面の法線nを求める
             std::vector<double> n(param::n);
             n = normal(d);
 
             // D = d_(m + 2)からd_1, ..., d_mが張る面へ直交するベクトルの大きさ
-            d[param::m + 1] = parents[param::m + 1].gene - p;
+            d.push_back(parents[param::m + 1].gene - p);
             // double D = dot(d[param::m + 1], n) / norm(n);
             double D = dot(d[param::m + 1], n) / norm(n);
             D = std::fabs(D);
@@ -81,6 +88,14 @@ int main(){
             // JGGによる更新
             std::sort(children.begin(), children.end());
             for(int i = 0; i < param::m + 2; i++) population[parent_index[i]] = children[i];
+
+            // // MGGによる更新
+            // for(int i = 0; i < param::m + 2; i++) children.push_back(parents[i]);
+            // std::vector<int> change_index;
+            // individual best_indiv = best_select(children, change_index);
+            // individual roulette_indiv = best_select(children, change_index);
+            // if(std::find(parents.begin(), parents.end(), children[change_index[0]]) == parents.end()) population[parent_index[0]] = best_indiv;
+            // if(std::find(parents.begin(), parents.end(), children[change_index[1]]) == parents.end()) population[parent_index[1]] = roulette_indiv;
 
             // 最も良い評価値の出力
             std::cout << "generation : " << g << ", fitness = " << std::min_element(population.begin(), population.end())->fitness << std::endl;
