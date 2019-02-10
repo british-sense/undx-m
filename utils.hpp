@@ -34,15 +34,16 @@ individual random_select(const std::vector<individual> &set, std::vector<int> &i
 individual roulette_select(const std::vector<individual> &set, std::vector<int> &index_list){
 
     double sum_fitness = 0.;
-    std::vector<individual> reverse_set(set);
+    std::vector<individual> roulette_set(set);
     for(size_t i = 0; i < set.size(); i++) sum_fitness += set[i].fitness;
-    for(size_t i = 0; i < set.size(); i++) reverse_set[i].fitness = sum_fitness - set[i].fitness;
-    for(size_t i = 0; i < reverse_set.size(); i++) sum_fitness += reverse_set[i].fitness;
+    for(size_t i = 0; i < set.size(); i++) roulette_set[i].fitness = sum_fitness - set[i].fitness;
+    sum_fitness = 0.;
+    for(size_t i = 0; i < roulette_set.size(); i++) sum_fitness += roulette_set[i].fitness;
     std::uniform_real_distribution<> roulette(0, sum_fitness);
     double roulette_fitness = roulette(param::mt);    
     int index = 0;
-    for(size_t i = 0; i < reverse_set.size(); i++){
-        roulette_fitness -= reverse_set[i].fitness;
+    for(size_t i = 0; i < roulette_set.size(); i++){
+        roulette_fitness -= roulette_set[i].fitness;
         if(roulette_fitness <= 0){
             index = i;
             break;

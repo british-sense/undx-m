@@ -10,12 +10,12 @@
 
 int main(){
 
-    std::cout << "number of trial : " << param::trial
-    std::cout << "number of generation : " << param::generation
-    std::cout << "population size : " << param::population
-    std::cout << "children size : " << param::children
-    std::cout << "number of parents : " << param::m
-    std::cout << "number of dimention : " << param::n
+    std::cout << "number of trial : " << param::trial << std::endl;
+    std::cout << "number of generation : " << param::generation << std::endl;
+    std::cout << "population size : " << param::population << std::endl;
+    std::cout << "children size : " << param::children << std::endl;
+    std::cout << "number of parents : " << param::m << std::endl;
+    std::cout << "number of dimention : " << param::n << std::endl;
 
     int opt_count = 0;
 
@@ -93,7 +93,7 @@ int main(){
             // for(int i = 0; i < param::m + 2; i++) children.push_back(parents[i]);
             // std::vector<int> change_index;
             // individual best_indiv = best_select(children, change_index);
-            // individual roulette_indiv = best_select(children, change_index);
+            // individual roulette_indiv = roulette_select(children, change_index);
             // if(std::find(parents.begin(), parents.end(), children[change_index[0]]) == parents.end()) population[parent_index[0]] = best_indiv;
             // if(std::find(parents.begin(), parents.end(), children[change_index[1]]) == parents.end()) population[parent_index[1]] = roulette_indiv;
 
@@ -110,3 +110,6 @@ int main(){
 
     return 0;
 }
+
+// roulette詳査
+// e従属, e正規化しない

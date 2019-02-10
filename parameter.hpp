@@ -6,7 +6,7 @@
 namespace param{
     static int n = 20;
     static int trial = 10;
-    static int generation = 10000;
+    static int generation = 1000;
     static int population = 300;
     static int children = 200;
     static int m = 5;
@@ -22,5 +22,3 @@ namespace param{
 }
 
 #endif
-
-// JGG : 2->0, 3->4, 4->4, 5->9, 6->9, 7->9, 8->10, 9->10 10->10, 15->10, 20->10
